@@ -7,7 +7,7 @@ interface AuthRequest extends Request {
    user?: any;
 }
 
-const authenticateJWT = (
+export const authenticateJWT = (
    req: AuthRequest,
    res: Response,
    next: NextFunction
@@ -15,23 +15,24 @@ const authenticateJWT = (
    const authHeader = req.headers.authorization;
 
    if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      return res
-         .status(401)
-         .json({ message: "Access denied. No token provided." });
+      res.status(401).json({ message: "Unauthorized" });
+      return;
    }
 
    const token = authHeader.split(" ")[1];
 
    if (!token) {
-      return res.status(401).json({ error: "No token provided" });
+      res.status(401).json({ error: "Unauthorized" });
+      return;
    }
 
    try {
       const decoded = jwt.verify(token, SECRET_KEY);
       req.user = decoded;
-      next();
+      return next();
    } catch (error) {
-      return res.status(403).json({ message: "Invalid or expired token." });
+      res.status(403).json({ message: "Unauthorized" });
+      return;
    }
 };
 
@@ -50,5 +51,3 @@ export const isAdmin = (
       res.status(403).json({ error: "UnAuthorized" });
    }
 };
-
-export default authenticateJWT;
