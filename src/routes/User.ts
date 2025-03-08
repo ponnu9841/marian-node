@@ -2,9 +2,11 @@ import { Router, type Request, type Response } from "express";
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { validateUser } from "../validation/user";
+import { validateUser, validateUserWithoutName } from "../validation/user";
 import { UserInput } from "../interfaces/user";
-import { errorHandler } from "../middleware/error-handler";
+import { errorHandler } from "../utils/error-handler";
+import { authenticateJWT } from "../utils/auth-middleware";
+import { AuthRequest } from "../interfaces/auth-request";
 
 const prisma = new PrismaClient();
 const router = Router();
@@ -26,7 +28,6 @@ router.post("/register", async (req: Request, res: Response) => {
             data: {
                ...reqBody,
                password: hashedPassword,
-               //   type: "admin",
             },
          });
          res.status(200).json(createdUser);
@@ -42,6 +43,15 @@ router.post("/register", async (req: Request, res: Response) => {
 
 router.post("/login", async (req: Request, res: Response) => {
    const { email, password } = req.body;
+   const reqBody: Omit<UserInput, "name"> = {
+      email,
+      password,
+   };
+   const response = validateUserWithoutName(reqBody);
+   if (response?.error?.details) {
+      res.status(400).json({ error: response.error.details[0].message });
+      return;
+   }
    try {
       const existingUser = await prisma.user.findUnique({
          where: { email },
@@ -65,23 +75,29 @@ router.post("/login", async (req: Request, res: Response) => {
          {
             userId: existingUser.id,
             email: existingUser.email,
-            name: existingUser.name
+            type: existingUser.type,
+            name: existingUser.name,
          },
          process.env.JWT_SECRET as string,
-         { expiresIn: "1h" }
+         { expiresIn: "24h" }
       );
 
       res.status(200).json({
-         success: true,
-         data: {
-            userId: existingUser.id,
-            email: existingUser.email,
-            token,
-         },
+         userId: existingUser.id,
+         email: existingUser.email,
+         token,
       });
    } catch (error) {
       errorHandler(error as Error, req, res);
    }
 });
+
+router.get(
+   "/user",
+   authenticateJWT,
+   async (req: AuthRequest, res: Response) => {
+      res.status(200).json({ data: req.user });
+   }
+);
 
 export default router;

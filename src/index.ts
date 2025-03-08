@@ -1,27 +1,45 @@
-// const express = require('express');
-// const { PrismaClient } = require('@prisma/client');
 import express, { type Express } from "express";
-import User from "./routes/User";
 import cors from "cors";
-// import dotenv from "dotenv";
-// import Todo from "./routes/Todo";
-// import Item from "./routes/Item";
-// dotenv.config();
+import User from "./routes/User";
+import Banner from "./routes/Banner";
 
 const app: Express = express();
 const PORT = 8000;
-app.use(cors());
+app.use(
+   cors({
+      origin: function (origin, callback) {
+         const allowedOrigins = [
+            "http://localhost:3000",
+            "https://api.mariandesignstudio.in",
+         ];
+         if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+            callback(null, true);
+         } else {
+            callback(new Error("Not allowed by CORS"));
+         }
+      },
+      methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+      allowedHeaders: [
+         "Content-Type",
+         "Authorization",
+         "X-Requested-With",
+         "Accept",
+      ],
+      credentials: true,
+   })
+);
+app.options("*", cors());
 
 // Middleware to parse JSON bodies
+app.use(express.static('public'));
 app.use(express.json());
 
 // Middleware to parse URL-encoded bodies
-// app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: true }));
 
-app.use("/api/user", User);
+app.use("/api", User);
+app.use("/api/banner", Banner);
 
-app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
-  });
+app.listen(PORT);
 
 module.exports = app;
