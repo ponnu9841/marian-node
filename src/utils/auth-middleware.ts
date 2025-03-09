@@ -1,8 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 
-const SECRET_KEY = process.env.JWT_SECRET || "your_secret_key";
-
 interface AuthRequest extends Request {
    user?: any;
 }
@@ -12,6 +10,7 @@ export const authenticateJWT = (
    res: Response,
    next: NextFunction
 ) => {
+   const SECRET_KEY = process.env.JWT_SECRET || "your_secret_key";
    const authHeader = req.headers.authorization;
 
    if (!authHeader || !authHeader.startsWith("Bearer ")) {
