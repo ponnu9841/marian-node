@@ -1,20 +1,26 @@
-import { Router, type Request, type Response } from "express";
-import { PrismaClient } from "@prisma/client";
 import { authenticateJWT } from "../utils/auth-middleware";
 import { upload } from "../utils/upload";
 import { deleteFileFromUrl, extractFilePath } from "../utils/file";
+import prisma, { disconnect } from "../utils/prisma";
+import createRouter from "../utils/router";
+import { deleteRecord } from "../utils/delete-request";
 
-const prisma = new PrismaClient();
-const router = Router();
+const router = createRouter();
 
-router.get("/", async (req: Request, res: Response) => {
-   const banner = await prisma.banner.findMany();
-
-   res.status(200).json({
-      data: banner,
-   });
-
+router.get("/", async (req, res) => {
    try {
+      const banner = await prisma.banner.findMany({
+         orderBy: { createdAt: "desc" },
+         select: {
+            id: true,
+            image: true,
+            alt: true,
+         },
+      });
+
+      res.status(200).json({
+         data: banner,
+      });
    } catch (error) {
       res.status(500).json({ error: "An error occurred" });
    }
@@ -24,7 +30,7 @@ router.post(
    "/",
    authenticateJWT,
    upload("banner").single("image"),
-   async (req: Request, res: Response) => {
+   async (req, res) => {
       const data = req.body;
       try {
          if (req.file) {
@@ -44,17 +50,8 @@ router.post(
    }
 );
 
-router.delete("/", authenticateJWT, async (req: Request, res: Response) => {
-   const { id, image } = req.query;
-   if (id && image) {
-      deleteFileFromUrl(image as string);
-      await prisma.banner.delete({
-         where: { id: id as string },
-      });
-      res.status(200).json({ message: "Banner deleted successfully" });
-   } else {
-      res.status(404).json({ message: "Image or Id not found" });
-   }
+router.delete("/", authenticateJWT, async (req, res) => {
+   deleteRecord(req, res, "banner");
 });
 
 export default router;

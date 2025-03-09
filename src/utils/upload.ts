@@ -1,6 +1,7 @@
 import multer from "multer";
 import path from "path";
 import fs from "fs";
+import { randomBytes } from "crypto";
 
 // Allowed image file types
 const allowedImageTypes = [
@@ -31,6 +32,7 @@ export const upload = (folderName: string) => {
                null,
                file.fieldname +
                   "-" +
+                  randomBytes(16).toString("hex") +
                   Date.now() +
                   path.extname(file.originalname)
             );
