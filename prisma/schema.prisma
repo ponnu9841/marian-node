@@ -42,6 +42,19 @@ model Service {
   @@map("services")
 }
 
+model Contact {
+  id            String   @id @default(uuid())
+  location      String
+  contactno_one String
+  contactno_two String?
+  email_one     String
+  email_two     String?
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  @@map("contacts")
+}
+
 enum Role {
   user
   admin
