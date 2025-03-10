@@ -4,7 +4,7 @@ import { deleteFileFromUrl, extractFilePath } from "../utils/file";
 import prisma, { disconnect } from "../utils/prisma";
 import createRouter from "../utils/router";
 import {
-   validateServicePostRequest,
+   // validateServicePostRequest,
    validateServicePutRequest,
 } from "../validation/service";
 import { deleteRecord } from "../utils/delete-request";
@@ -41,8 +41,6 @@ router.get("/", async (req, res) => {
       );
    } catch (error) {
       console.log(error);
-   } finally {
-      disconnect();
    }
 });
 
@@ -73,8 +71,6 @@ router.post(
          res.status(200).json({ data: portfolio });
       } catch (error) {
          console.log(error);
-      } finally {
-         disconnect();
       }
    }
 );

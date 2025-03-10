@@ -1,6 +1,6 @@
 import { authenticateJWT } from "../utils/auth-middleware";
 import { upload } from "../utils/upload";
-import prisma, { disconnect } from "../utils/prisma";
+import prisma from "../utils/prisma";
 import createRouter from "../utils/router";
 import { deleteRecord } from "../utils/delete-request";
 
@@ -14,7 +14,6 @@ router.get("/", async (_, res) => {
          data: contact,
       });
    } catch (error) {
-      disconnect();
    }
 });
 
@@ -36,7 +35,6 @@ router.post("/", authenticateJWT, async (req, res) => {
       res.status(200).json({ data: contact });
    } catch (error) {
       console.log(error);
-      disconnect();
    }
 });
 
@@ -61,7 +59,6 @@ router.put(
          res.status(200).json({ data: contact });
       } catch (error) {
          console.log(error);
-         disconnect();
       }
    }
 );

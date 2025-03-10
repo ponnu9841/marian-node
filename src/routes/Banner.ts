@@ -1,7 +1,7 @@
 import { authenticateJWT } from "../utils/auth-middleware";
 import { upload } from "../utils/upload";
-import { deleteFileFromUrl, extractFilePath } from "../utils/file";
-import prisma, { disconnect } from "../utils/prisma";
+import { extractFilePath } from "../utils/file";
+import prisma from "../utils/prisma";
 import createRouter from "../utils/router";
 import { deleteRecord } from "../utils/delete-request";
 
@@ -23,7 +23,6 @@ router.get("/", async (req, res) => {
       });
    } catch (error) {
       res.status(500).json({ error: "An error occurred" });
-      disconnect();
    }
 });
 
@@ -47,7 +46,6 @@ router.post(
          }
       } catch (error) {
          res.status(500).json({ error: "An error occurred" });
-         disconnect();
       }
    }
 );
