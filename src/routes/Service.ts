@@ -30,8 +30,6 @@ router.get("/", async (_, res) => {
       });
    } catch (error) {
       console.log(error);
-   } finally {
-      disconnect();
    }
 });
 
@@ -63,8 +61,6 @@ router.post(
          res.status(200).json({ data: service });
       } catch (error) {
          console.log(error);
-      } finally {
-         disconnect();
       }
    }
 );
@@ -104,8 +100,6 @@ router.put(
          res.status(200).json({ data: service });
       } catch (error) {
          console.log(error);
-      } finally {
-         disconnect();
       }
    }
 );
