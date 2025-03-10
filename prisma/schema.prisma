@@ -55,6 +55,18 @@ model Contact {
   @@map("contacts")
 }
 
+model About {
+  id                String @id @default(uuid())
+  title             String
+  title_badge       String
+  image             String
+  alt               String?
+  short_description String
+  long_description  String?
+
+  @@map("about")
+}
+
 enum Role {
   user
   admin

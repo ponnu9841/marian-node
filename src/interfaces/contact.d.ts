@@ -1,4 +1,5 @@
 type Contact = {
+   alt?: string;
    location: string;
    contactno_one: string;
    contactno_two?: string;
