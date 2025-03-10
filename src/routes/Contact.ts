@@ -1,12 +1,7 @@
 import { authenticateJWT } from "../utils/auth-middleware";
 import { upload } from "../utils/upload";
-import { deleteFileFromUrl, extractFilePath } from "../utils/file";
 import prisma from "../utils/prisma";
 import createRouter from "../utils/router";
-import {
-   validateServicePostRequest,
-   validateServicePutRequest,
-} from "../validation/service";
 import { deleteRecord } from "../utils/delete-request";
 
 const router = createRouter();
