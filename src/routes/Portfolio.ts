@@ -8,26 +8,37 @@ import {
    validateServicePutRequest,
 } from "../validation/service";
 import { deleteRecord } from "../utils/delete-request";
+import {
+   createPaginatedResponse,
+   getPaginationParams,
+} from "../utils/pagination";
 
 const router = createRouter();
-const uploadMiddleware = upload("service");
+const uploadMiddleware = upload("portfolio");
 
-router.get("/", async (_, res) => {
+router.get("/", async (req, res) => {
    try {
-      const services = await prisma.service.findMany({
+      const { skip, take } = getPaginationParams(req);
+      const page = parseInt(req.query.page as string) || 1;
+      const limit = take;
+
+      const portfolios = await prisma.portfolio.findMany({
+         skip,
+         take,
          orderBy: { createdAt: "desc" },
          select: {
             id: true,
-            title: true,
             image: true,
             alt: true,
-            short_description: true,
-            long_description: true,
+            title: true,
+            description: true,
          },
       });
-      res.status(200).json({
-         data: services,
-      });
+      // Get total count for pagination metadata
+      const totalPosts = await prisma.portfolio.count();
+      res.status(200).json(
+         createPaginatedResponse(portfolios, totalPosts, page, limit)
+      );
    } catch (error) {
       console.log(error);
    } finally {
@@ -49,18 +60,17 @@ router.post(
          const filePath = extractFilePath(req.file);
          const data = req.body;
          const reqBody = {
-            title: data.title,
             image: filePath,
             alt: data.alt,
-            short_description: data.shortDescription,
-            long_description: data.longDescription,
+            title: data.title,
+            description: data.description,
          };
-         const validated = validateServicePostRequest(reqBody);
-         const service = await prisma.service.create({
+         //  const validated = validateServicePostRequest(reqBody);
+         const portfolio = await prisma.portfolio.create({
             data: reqBody,
          });
 
-         res.status(200).json({ data: service });
+         res.status(200).json({ data: portfolio });
       } catch (error) {
          console.log(error);
       } finally {
@@ -76,11 +86,10 @@ router.put(
    async (req, res) => {
       try {
          const data = req.body;
-         const reqBody: Omit<ServicePutRequest, "id"> = {
+         const reqBody: { [key: string]: any } = {
             alt: data.alt,
             title: data.title,
-            short_description: data.shortDescription,
-            long_description: data.longDescription,
+            description: data.description,
          };
          const validated = validateServicePutRequest({
             ...reqBody,
@@ -90,18 +99,18 @@ router.put(
          if (req.file) {
             //update without saving image
             reqBody["image"] = extractFilePath(req.file);
-            const service = await prisma.service.findUnique({
+            const portfolio = await prisma.portfolio.findUnique({
                where: { id: data.id },
             });
-            deleteFileFromUrl(service?.image as string);
+            deleteFileFromUrl(portfolio?.image as string);
          }
 
          // console.log(validated.value);
-         const service = await prisma.service.update({
+         const portfolioUpdated = await prisma.portfolio.update({
             where: { id: data.id },
             data: reqBody,
          });
-         res.status(200).json({ data: service });
+         res.status(200).json({ data: portfolioUpdated });
       } catch (error) {
          console.log(error);
       } finally {
@@ -111,7 +120,7 @@ router.put(
 );
 
 router.delete("/", authenticateJWT, async (req, res) => {
-   deleteRecord(req, res, "service");
+   deleteRecord(req, res, "portfolio");
 });
 
 export default router;

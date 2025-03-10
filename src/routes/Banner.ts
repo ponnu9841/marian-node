@@ -23,6 +23,7 @@ router.get("/", async (req, res) => {
       });
    } catch (error) {
       res.status(500).json({ error: "An error occurred" });
+      disconnect();
    }
 });
 
@@ -46,6 +47,7 @@ router.post(
          }
       } catch (error) {
          res.status(500).json({ error: "An error occurred" });
+         disconnect();
       }
    }
 );

@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { deleteFileFromUrl } from "./file";
-import prisma from "./prisma";
+import prisma, { disconnect } from "./prisma";
 
 export const deleteRecord = async (
     req: Request,
@@ -28,6 +28,7 @@ export const deleteRecord = async (
     } catch (error) {
         console.error("Error deleting record:", error);
         res.status(500).json({ message: "Failed to delete record" });
-        return
+    } finally {
+        disconnect();
     }
 };
