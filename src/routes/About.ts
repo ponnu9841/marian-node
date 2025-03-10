@@ -1,7 +1,7 @@
 import { authenticateJWT } from "../utils/auth-middleware";
 import { upload } from "../utils/upload";
 import { deleteFileFromUrl, extractFilePath } from "../utils/file";
-import prisma from "../utils/prisma";
+import prisma, { disconnect } from "../utils/prisma";
 import createRouter from "../utils/router";
 import {
    validateServicePostRequest,
@@ -20,6 +20,8 @@ router.get("/", async (_, res) => {
       });
    } catch (error) {
       console.log(error);
+   } finally {
+      disconnect();
    }
 });
 
@@ -52,6 +54,8 @@ router.post(
          res.status(200).json({ data: about });
       } catch (error) {
          console.log(error);
+      } finally {
+         disconnect();
       }
    }
 );
@@ -84,6 +88,8 @@ router.put(
          res.status(200).json({ data: about });
       } catch (error) {
          console.log(error);
+      } finally {
+         disconnect();
       }
    }
 );

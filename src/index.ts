@@ -5,6 +5,7 @@ import Banner from "./routes/Banner";
 import Service from "./routes/Service";
 import Contact from "./routes/Contact";
 import About from "./routes/About";
+import Portfolio from "./routes/Portfolio";
 
 const app: Express = express();
 const PORT = 8000;
@@ -13,6 +14,7 @@ app.use(
       origin: function (origin, callback) {
          const allowedOrigins = [
             "http://localhost:3000",
+            "https://mariandesignstudio.in",
             "https://api.mariandesignstudio.in",
          ];
          if (!origin || allowedOrigins.indexOf(origin) !== -1) {
@@ -45,6 +47,7 @@ app.use("/api/banner", Banner);
 app.use("/api/service", Service);
 app.use("/api/contact", Contact);
 app.use("/api/about", About);
+app.use("/api/portfolio", Portfolio);
 
 app.listen(PORT);
 

@@ -16,8 +16,15 @@ export interface PaginationMeta {
 }
 
 export interface PaginatedResponse<T> {
-   data: T[];
-   meta: PaginationMeta;
+   data: {
+      data: T[];
+      page: number;
+      limit: number;
+      totalItems: number;
+      totalPages: number;
+      hasNextPage: boolean;
+      hasPreviousPage: boolean;
+   };
 }
 
 /**
@@ -26,12 +33,10 @@ export interface PaginatedResponse<T> {
  * @param defaultLimit Default number of items per page
  * @returns Pagination parameters for Prisma query
  */
-export function getPaginationParams(
-   req: Request,
-): PaginationParams {
+export function getPaginationParams(req: Request): PaginationParams {
    const defaultLimit = 10;
    const page = parseInt(req.query.page as string) || 1;
-   const limit = parseInt(req.query.limit as string) || defaultLimit;
+   const limit = parseInt(req.query.page_size as string) || defaultLimit;
 
    // Ensure page and limit are positive numbers
    const validPage = page > 0 ? page : 1;
@@ -60,8 +65,8 @@ export function createPaginatedResponse<T>(
    const totalPages = Math.ceil(totalItems / limit);
 
    return {
-      data,
-      meta: {
+      data: {
+         data,
          page,
          limit,
          totalItems,
