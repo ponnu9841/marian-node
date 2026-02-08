@@ -15,6 +15,7 @@ app.use(
          const allowedOrigins = [
             "http://localhost:3000",
             "https://mariandesignstudio.in",
+            "https://www.mariandesignstudio.in",
             "https://api.mariandesignstudio.in",
          ];
          if (!origin || allowedOrigins.indexOf(origin) !== -1) {
